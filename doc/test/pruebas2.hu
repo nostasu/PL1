@@ -10,6 +10,8 @@ procedure a () is
 	CIERTO: constant := 2;
 	FALSO: constant := 4;
 	PATATA: constant := TRUE;
+	--ERRORES
+	--TRES: constant := -1;,
 
 	--PRUEBA DECLARACIONES TIPOS
 	TYPE tPersona is record
@@ -33,6 +35,9 @@ procedure a () is
 	xvar: Integer;
 	abc: tPersona;
 	a: Integer;
+	p1, p2: TPersona;
+	-- No se permiten asignaciones aqui
+	-- a: Integer := 1;
 	
 	--Declaracion de funciones
 	function uno () return Integer is
@@ -44,7 +49,7 @@ procedure a () is
 		-- Declaracion variables locales
 		z: Integer;
 		begin
-			--z := x-y;
+			z := x-y;
 			return z;
 		end resta;
 	
@@ -85,6 +90,6 @@ procedure a () is
 	
 	--end dos;
 	begin
-	x := x-2; -- Este es un comentario después de una senctencia
+	x := x-2; -- Este es un comentario después de una sentencia
 	--CIERTO: constant := 2;
 end a;

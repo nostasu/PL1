@@ -11,5 +11,5 @@ begin
 	Put_line(cita.usuario.dni);
 	Put_line(TRUE);
 	-- Error en putline
-	Put_line(a,b);
+	--Put_line(a,b);
 end testCase02;

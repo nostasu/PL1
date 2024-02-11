@@ -1,0 +1,116 @@
+-- salida números
+
+procedure testCase02 () is
+
+	function uno() return Integer is
+	begin
+		return 1;
+	end uno;
+	
+	function resta (x, y: Integer) return Integer is
+		-- Declaracion variables locales
+		z: Integer;
+		begin
+			z := x-y;
+			return z;
+		end resta;
+	
+	function mayor (x,y: Integer) return Boolean is
+		begin
+			return x > y;
+		end mayor;
+	
+	--Ejemplo declaración de subprogramas anidados
+	function padre (x: Integer, y:Integer) return Integer is
+		z: Integer;
+		procedure escribe (a: Integer) is
+			begin
+				Put_line("a"); -- Muestra el valor de a
+			end escribe;
+		begin
+			--z:= x-y;
+			escribe(z);
+			return z;
+	end padre;
+	
+	function resta (x, y: Out Integer) return Integer is
+			begin
+				z := x-y;
+				c1.fecha := 1234;
+				x:= usuario.edad;
+				mayorEdad := usario.edad.valor > 18;
+				cita.usuario.edad := 30;
+								a := resta(2,2);
+				distinto := 3/= 4;
+				return z;
+			end resta;
+	procedure vacio() is
+	begin
+	end vacio;
+	procedure resta(x,y,z: out Integer) is
+		-- parametros referencia
+	begin
+		z:= x-y;
+		x:= x-y;
+		-- return x;
+	end vacio;
+	
+	procedure mayor(x,y: out Integer, a: out Boolean) is
+		-- parametros referencia
+	begin
+		z:= x-y;
+		x:= x-y;
+		-- return x;
+	end vacio;
+	
+begin
+	a:= resta(5,8);
+	y:= resta(a, resta(b,c));
+	x:= funcion1();
+	i := 3 - 7;
+	distinto := 374; --distinto es variable logica
+	cita.usuario.edad := 30;
+	a := 2 - resta(2,2);
+	-- resta(2,3) := 5;
+	
+	-- Ejemplos bucle if
+	if a/=b then
+		a:= a-1;
+	end if;
+	
+	-- expresion mas compleja
+		if a/=b and x>y then
+				a:= a-1;
+				b:=b-1;
+	end if;
+	
+	-- expresion con parentesis
+	if (a/=b and x>y) then
+		a:= a-1;
+		b:=b-1;
+	end if;
+	-- uso de else
+	if esCierto then
+	valor:=true;
+	else
+	valor:=false;
+	end if;
+	if (a/=b and x>y) then
+		a:= a-1;
+		b:=b-1;
+	end if;
+	
+	while(a>5) loop
+		a:=a-1;
+		Put_line(a);
+	end loop;
+	
+		while (a/=b and x>y) loop
+		a:=a-1;
+		Put_line(a);
+	end loop;
+			while (esCierto) loop
+		a:=a-1;
+		Put_line(a);
+	end loop;
+end testCase02;

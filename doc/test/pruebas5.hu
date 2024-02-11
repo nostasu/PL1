@@ -1,0 +1,48 @@
+-- Ejemplo de un programa completo
+
+procedure ejemplo () is
+	-- constantes simbolicas
+	MAYORDEEDAD : constant := 17;
+	
+	-- tipos flobales
+	type TPersona is record
+		dni: Integer;
+		edad: Integer;
+	end record;
+	
+	--variables globales
+	persona1: Tpersona;
+	
+	--subprogramas
+	function mayorDeEdad (edad: Integer) return Boolean is
+	begin
+		if edad>MAYORDEEDAD then
+			return true;
+		else
+			return False;
+		end if;
+	end mayorDeEdad;
+	
+	procedure imprimePersona (dni: Integer, edad:Integer) is
+		-- variable local
+		debug: Boolean;
+		--procedimiento anidado
+		procedure escribe (x: Integer) is
+		begin
+			Put_line(x);
+		end escribe;
+	begin -- de imprimePersona
+		escribe(dni);
+		debug := True;
+	end imprimePersona;
+	
+	-- procedimiento Principal
+	begin 
+		persona.dni := 1234;
+		persona.edad := 23;
+		if mayorDeEdad(persona.edad) then
+        	Put_line("Persona:");
+        	x := 1;
+        	imprimePersona(persona.dine, persona.edad);
+		end if;
+end ejemplo;
