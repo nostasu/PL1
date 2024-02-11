@@ -52,7 +52,7 @@ END_LINE = \r\n|\f|\r|\n
 // Identificadores, es una secuencia ordenada de caracteres y dígitos que comienzan obligatoriamente por una letra
 identifier = [a-zA-Z][a-zA-Z0-9]* 
 number = 0|[1-9][0-9]*
-//Definir un número malo cuando empieza
+//Definir un número mal formado cuando empieza por 0
 numberError = 0[0-9]+
 %%
 
