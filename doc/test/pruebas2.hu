@@ -1,0 +1,90 @@
+-- programa vacio
+
+-- Este es un comentario correcto
+-- Este comentario
+-- Ocupa varias lineas  
+ -- - - Este es un comentario erroneo
+
+procedure a () is
+	--PRUEBA DEFINICION DE CONSTANTES
+	CIERTO: constant := 2;
+	FALSO: constant := 4;
+	PATATA: constant := TRUE;
+
+	--PRUEBA DECLARACIONES TIPOS
+	TYPE tPersona is record
+	dni: Integer;
+	edad: Boolean;
+	end record;
+	TYPE tFecha is record
+	dia: Integer;
+	mes: Integer;
+	anyo: Integer;
+	end record;
+	
+
+	TYPE tCita is record
+	usuario: tPersona;
+	fecha: tFecha;
+	end record;
+	
+	
+	--Declaraciones variables
+	xvar: Integer;
+	abc: tPersona;
+	a: Integer;
+	
+	--Declaracion de funciones
+	function uno () return Integer is
+		begin
+			return 1;
+		end uno;
+	
+	function resta (x, y: Integer) return Integer is
+		-- Declaracion variables locales
+		z: Integer;
+		begin
+			--z := x-y;
+			return z;
+		end resta;
+	
+	function mayor (x,y: Integer) return Boolean is
+		begin
+			return x > y;
+		end mayor;
+	
+	--Ejemplo declaración de subprogramas anidados
+	function padre (x: Integer, y:Integer) return Integer is
+		z: Integer;
+		procedure escribe (a: Integer) is
+			begin
+				Put_line("a"); -- Muestra el valor de a
+			end escribe;
+		begin
+			--z:= x-y;
+			escribe(z);
+			return z;
+	end padre;
+	
+	function resta (x, y: Out Integer) return Integer is
+			begin
+				z := x-y;
+				c1.fecha := 1234;
+				x:= usuario.edad;
+				mayorEdad := usario.edad.valor > 18;
+				cita.usuario.edad := 30;
+								a := resta(2,2);
+				distinto := 3/= 4;
+				return z;
+			end resta;
+	
+	-- ERROR; function dos faltan los parentesis
+	--function dos return Integer is
+	--begin
+	--	return 2;	
+	
+	--end dos;
+	begin
+	x := x-2; -- Este es un comentario después de una senctencia
+	--CIERTO: constant := 2;
+end a;

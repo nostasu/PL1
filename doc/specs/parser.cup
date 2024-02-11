@@ -1,0 +1,366 @@
+package compiler.syntax;
+
+// Declaracion de importaciones 
+//(No modificar las proporcionadas. Se pueden agregar mas)
+
+import java_cup.runtime.Symbol;
+import java.util.*;
+
+import es.uned.lsi.compiler.lexical.*;
+import es.uned.lsi.compiler.code.*;
+import es.uned.lsi.compiler.intermediate.*;
+import es.uned.lsi.compiler.semantic.*;
+import es.uned.lsi.compiler.semantic.symbol.*;
+import es.uned.lsi.compiler.semantic.type.*;
+import es.uned.lsi.compiler.syntax.*;
+
+import compiler.CompilerContext;
+import compiler.lexical.*;
+import compiler.syntax.nonTerminal.*;
+
+import compiler.semantic.symbol.*;
+import compiler.semantic.type.*;
+import compiler.intermediate.*;
+import compiler.code.*;
+
+// Declaracion del codigo de usuario
+
+action code {:
+	
+	SyntaxErrorManager   syntaxErrorManager   = CompilerContext.getSyntaxErrorManager();
+	SemanticErrorManager semanticErrorManager = CompilerContext.getSemanticErrorManager ();
+	ScopeManagerIF       scopeManager         = CompilerContext.getScopeManager ();
+	FinalCodeFactoryIF   finalCodeFactory     = CompilerContext.getFinalCodeFactory ();
+
+:}	
+
+parser code {:
+	SyntaxErrorManager syntaxErrorManager = CompilerContext.getSyntaxErrorManager();
+	
+	public void syntax_error(Symbol symbol)
+	{ 
+	    Token token = (Token) symbol.value;
+	    syntaxErrorManager.syntaxError ("Error sintactico", token);	    
+	}
+		
+	public void unrecovered_syntax_error(java_cup.runtime.Symbol symbol)
+	{	
+	    Token token = (Token) symbol.value;
+	    syntaxErrorManager.syntaxFatalError ("Error fatal", token);
+	}
+:}
+
+// Declaracion de terminales (Ejemplo)
+
+terminal Token OPENPARENTHESIS;
+terminal Token CLOSEPARENTHESIS;
+terminal Token SEMICOLON;
+terminal Token COLON;
+terminal Token ASSIGNMENT;
+terminal Token COMMA;
+terminal Token MULTIPLY;
+terminal Token MINUS;
+terminal Token IDENTIFIER;
+terminal Token STRING;
+terminal Token NUMBER;
+terminal Token DOT;
+
+
+terminal Token GREATER;
+terminal Token DISTINCT;
+// Palabras reservadas
+terminal Token AND;
+terminal Token BEGIN;
+terminal Token BOOLEAN;
+terminal Token CONSTANT;
+terminal Token ELSE;
+terminal Token END;
+terminal Token FALSE;
+terminal Token FUNCTION;
+terminal Token IF;
+terminal Token INTEGER;
+terminal Token IS;
+terminal Token LOOP;
+terminal Token OUT;
+terminal Token PROCEDURE;
+terminal Token PUTLINE;
+terminal Token RECORD;
+terminal Token RETURN;
+terminal Token THEN;
+terminal Token TRUE;
+terminal Token TYPE;
+terminal Token WHILE;
+
+
+// Declaracion de no terminales
+// no modificar los propuestos
+
+non terminal  			program;
+non terminal Axiom		axiom;
+
+non terminal procedure_declaration;
+
+non terminal declarations;
+non terminal const_declarations_list;
+non terminal const_declaration;
+non terminal record_declarations;
+non terminal record_list;
+non terminal record_field;
+non terminal record_declaration;
+non terminal record_end;
+non terminal var_declaration_list;
+non terminal var_declarations;
+non terminal var_declaration;
+non terminal subprograms_declaration_list;
+non terminal sentences_list;
+non terminal sentences;
+non terminal end;
+non terminal const_types;
+non terminal boolean;
+non terminal primitive_types;
+non terminal function_declaration;
+non terminal function_parameters;
+non terminal function_end;
+non terminal function_body;
+non terminal parameter_declaration;
+non terminal local_declarations;
+non terminal local_var;
+non terminal assignment_sentence;
+non terminal assignment_sentence_list;
+non terminal expression;
+non terminal logic_expression;
+non terminal arithmetic_expression;
+non terminal function_body_list;
+non terminal parameter_declarations;
+non terminal local_declarations_list;
+non terminal procedure_body;
+non terminal function_call;
+non terminal parameter_function_call;
+non terminal parameter_putline_call;
+non terminal if;
+non terminal while;
+non terminal ES_sentences;
+non terminal assignment_types;
+non terminal return_types;
+non terminal record_access_list;
+non terminal expression_types;
+non terminal expression_plus_function;
+non terminal parameter_function_call_types;
+non terminal single_function_call;
+non terminal procedure_body_list;
+non terminal boolean_expression;
+non terminal boolean_parenthesis;
+non terminal loop_sentences_list;
+non terminal loop_sentences;
+non terminal loop_boolean_list;
+// ...
+
+
+// Declaracion de relaciones de precedencia
+precedence left DOT,OPENPARENTHESIS,CLOSEPARENTHESIS;
+precedence left MULTIPLY;
+precedence left MINUS;
+precedence left GREATER;
+precedence left DISTINCT;
+precedence left AND;
+// ...
+
+// Declaración de reglas de produccion
+
+
+start with program;
+
+program ::= 
+  {: 
+        syntaxErrorManager.syntaxInfo ("Starting parsing..."); 
+  :}
+  axiom:ax
+  {:   		
+  		
+  		syntaxErrorManager.syntaxInfo ("Parsing process ended.");
+  :};
+
+
+axiom ::= procedure_declaration BEGIN end
+	| procedure_declaration BEGIN sentences_list end
+	| procedure_declaration declarations BEGIN end
+	| procedure_declaration declarations BEGIN sentences_list end //La lista de sentencias y la declaracion de los bloques puede ser vacía.
+	| procedure_declaration declarations BEGIN sentences_list error{:syntaxErrorManager.syntaxFatalError("ERROR: Error en el end final"); :};
+	
+procedure_declaration ::= PROCEDURE IDENTIFIER OPENPARENTHESIS CLOSEPARENTHESIS IS 
+					| PROCEDURE error{:syntaxErrorManager.syntaxInfo("ERROR: Falta el identificador"); :} OPENPARENTHESIS CLOSEPARENTHESIS IS
+					| PROCEDURE IDENTIFIER error{:syntaxErrorManager.syntaxInfo("ERROR: Falta el parentesis de apertura"); :} CLOSEPARENTHESIS IS
+					| PROCEDURE IDENTIFIER OPENPARENTHESIS error{:syntaxErrorManager.syntaxInfo("ERROR: Falta el parentesis de cierre"); :} IS;
+
+//Para evitar las proyecciones epsilon, aqui se detallan todas las posibles opciones considerando que todas pueden ser opcionales
+declarations ::= const_declarations_list 
+                | record_declarations 
+                | var_declarations 
+                | subprograms_declaration_list 
+                | const_declarations_list record_declarations 
+                | const_declarations_list var_declarations 
+                | const_declarations_list subprograms_declaration_list 
+                | record_declarations var_declarations 
+                | record_declarations subprograms_declaration_list 
+                | var_declarations subprograms_declaration_list 
+                | record_declarations var_declarations subprograms_declaration_list 
+                | const_declarations_list record_declarations var_declarations 
+                | const_declarations_list record_declarations subprograms_declaration_list 
+                | const_declarations_list var_declarations subprograms_declaration_list 
+                | const_declarations_list record_declarations var_declarations subprograms_declaration_list;
+
+const_declarations_list ::= const_declaration
+                    | const_declarations_list const_declaration;
+
+const_declaration ::= IDENTIFIER COLON CONSTANT ASSIGNMENT const_types SEMICOLON;
+
+//Sólo pueden ser del tipo entero o lógico.
+const_types ::= NUMBER 
+	| boolean ;
+	
+boolean ::= TRUE 
+	| FALSE;
+	
+record_declarations ::= record_declaration 
+	| record_declarations record_declaration;       
+record_declaration ::= TYPE IDENTIFIER:id IS RECORD record_list record_end; 
+record_list ::= record_field record_list 
+	| record_field;
+record_field ::= IDENTIFIER COLON primitive_types SEMICOLON 
+	| IDENTIFIER COLON IDENTIFIER SEMICOLON;
+record_end ::= END RECORD SEMICOLON
+	| error {: syntaxErrorManager.syntaxDebug ("Error: Final de registro erroneo"); :};
+
+end ::= END IDENTIFIER SEMICOLON;
+
+var_declarations ::= var_declaration_list
+    | var_declarations var_declaration_list ;
+
+var_declaration_list ::= var_declaration 
+	| IDENTIFIER COMMA var_declaration_list;
+
+var_declaration ::= IDENTIFIER COLON IDENTIFIER:id SEMICOLON	
+	| IDENTIFIER COLON primitive_types SEMICOLON;
+	
+subprograms_declaration_list ::= function_declaration 
+    | subprograms_declaration_list function_declaration;
+  
+function_declaration ::= FUNCTION IDENTIFIER OPENPARENTHESIS CLOSEPARENTHESIS RETURN primitive_types IS BEGIN function_body_list function_end 
+					   | FUNCTION IDENTIFIER OPENPARENTHESIS CLOSEPARENTHESIS RETURN primitive_types IS local_var BEGIN function_body_list function_end 
+				   	   | FUNCTION IDENTIFIER OPENPARENTHESIS function_parameters CLOSEPARENTHESIS RETURN primitive_types IS BEGIN function_body_list function_end
+					   | FUNCTION IDENTIFIER OPENPARENTHESIS function_parameters CLOSEPARENTHESIS RETURN primitive_types IS local_declarations_list BEGIN function_body_list function_end
+					   | FUNCTION IDENTIFIER error {: syntaxErrorManager.syntaxFatalError ("Error: Faltan los dos parentesis"); :} RETURN primitive_types IS local_declarations_list BEGIN function_body_list function_end; 
+function_parameters ::= parameter_declarations
+    | IDENTIFIER COMMA function_parameters;
+
+parameter_declarations ::= parameter_declaration 
+	| parameter_declaration COMMA parameter_declarations;
+
+//REVISAR QUE PUEDE IR EXACTAMENTE AQUI 
+parameter_declaration ::= IDENTIFIER COLON IDENTIFIER
+	| IDENTIFIER COLON primitive_types
+	| IDENTIFIER COLON OUT IDENTIFIER
+	| IDENTIFIER COLON OUT primitive_types;
+
+function_body_list ::= function_body | function_body_list function_body;
+function_body ::= assignment_sentence
+	| procedure_declaration
+	| function_call
+	| return_types
+	| if;
+	
+single_function_call ::= IDENTIFIER OPENPARENTHESIS parameter_function_call CLOSEPARENTHESIS;
+function_call ::= single_function_call SEMICOLON
+	| ES_sentences;
+	
+parameter_function_call ::= parameter_function_call_types 
+	| parameter_function_call_types COMMA parameter_function_call;
+parameter_function_call_types ::= IDENTIFIER | STRING | NUMBER;
+procedure_declaration ::= PROCEDURE IDENTIFIER OPENPARENTHESIS parameter_declaration CLOSEPARENTHESIS IS BEGIN procedure_body_list end;
+
+procedure_body_list ::= procedure_body | procedure_body_list procedure_body;
+procedure_body ::= assignment_sentence_list
+	| function_call
+	| if;
+
+ES_sentences ::= PUTLINE OPENPARENTHESIS parameter_putline_call CLOSEPARENTHESIS SEMICOLON;
+parameter_putline_call ::= IDENTIFIER 
+	| STRING
+	| NUMBER
+	| expression
+	| boolean
+	| record_access_list
+	| error{:syntaxErrorManager.syntaxInfo("ERROR: Error en la llamada de putline"); :};
+	
+
+local_declarations_list ::= local_declarations | local_declarations_list local_declarations;
+local_declarations ::= procedure_declaration | local_var;
+
+sentences_list ::= sentences
+    | sentences_list sentences;
+    
+sentences ::= ES_sentences
+	| assignment_sentence
+	| if
+	| while
+	| return_types
+	| IDENTIFIER COLON CONSTANT error{:syntaxErrorManager.syntaxInfo("ERROR: No se permite la declaracion de constantes en este bloque"); :};
+		 
+assignment_sentence ::= IDENTIFIER ASSIGNMENT expression SEMICOLON
+	| IDENTIFIER ASSIGNMENT boolean SEMICOLON
+	| IDENTIFIER ASSIGNMENT single_function_call SEMICOLON
+	| IDENTIFIER ASSIGNMENT NUMBER SEMICOLON
+	| IDENTIFIER ASSIGNMENT record_access_list SEMICOLON
+	| record_access_list ASSIGNMENT expression SEMICOLON
+	| record_access_list ASSIGNMENT boolean SEMICOLON
+	| record_access_list ASSIGNMENT single_function_call SEMICOLON
+	| record_access_list ASSIGNMENT NUMBER SEMICOLON
+	| record_access_list ASSIGNMENT record_access_list SEMICOLON;
+
+record_access_list ::= IDENTIFIER DOT IDENTIFIER | IDENTIFIER DOT record_access_list;
+
+if ::= IF boolean_expression THEN loop_sentences_list END IF SEMICOLON
+	| IF boolean_expression THEN loop_sentences_list ELSE loop_sentences_list END IF SEMICOLON;
+
+while ::= WHILE boolean_expression LOOP loop_sentences_list END LOOP SEMICOLON;
+
+loop_sentences_list ::= loop_sentences | loop_sentences_list loop_sentences;
+loop_sentences ::= ES_sentences
+	| assignment_sentence; 
+	
+boolean_expression ::= IDENTIFIER
+	| IDENTIFIER AND boolean_parenthesis
+	| IDENTIFIER AND loop_boolean_list
+	| boolean_parenthesis
+	| boolean AND loop_boolean_list
+	| expression_types logic_expression expression_types
+	| OPENPARENTHESIS IDENTIFIER AND boolean_parenthesis CLOSEPARENTHESIS;
+	
+boolean_parenthesis ::= OPENPARENTHESIS expression_types logic_expression expression_types CLOSEPARENTHESIS
+	| OPENPARENTHESIS loop_boolean_list CLOSEPARENTHESIS;
+
+loop_boolean_list ::= boolean | boolean AND loop_boolean_list;
+expression ::= expression_types logic_expression expression_plus_function
+	| expression_types arithmetic_expression expression_plus_function;
+
+logic_expression ::= GREATER
+	| DISTINCT;
+arithmetic_expression ::= MINUS 
+	| MULTIPLY;
+
+expression_types ::= IDENTIFIER | NUMBER | record_access_list;
+expression_plus_function ::= IDENTIFIER | NUMBER | record_access_list | single_function_call;
+local_var ::= IDENTIFIER COLON primitive_types SEMICOLON
+		| error{:syntaxErrorManager.syntaxInfo("ERROR: Error en la declaracion de la variable"); :};
+function_end ::= END IDENTIFIER SEMICOLON;
+
+
+return_types ::= RETURN IDENTIFIER SEMICOLON
+	| RETURN expression_types logic_expression expression_types SEMICOLON
+	| RETURN expression_types arithmetic_expression expression_types SEMICOLON
+	| RETURN NUMBER SEMICOLON;
+
+assignment_types ::= boolean | NUMBER;
+
+primitive_types ::= INTEGER 
+	| BOOLEAN;

@@ -1,0 +1,15 @@
+-- salida 
+
+procedure testCase02 () is
+
+begin
+	Put_line("a");
+	Put_line("Hola mundoo");
+	Put_line(a);
+	Put_line(1);
+	Put_line(x-1);
+	Put_line(cita.usuario.dni);
+	Put_line(TRUE);
+	-- Error en putline
+	Put_line(a,b);
+end testCase02;

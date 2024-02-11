@@ -1,0 +1,11 @@
+-- salida números
+
+procedure testCase02 () is
+
+begin
+	Put_line(0);
+	Put_line(4000);
+	--Error numero mal formado
+	--Put_line(02);
+
+end testCase02;
